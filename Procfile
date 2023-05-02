@@ -1,0 +1,1 @@
+web: gunicorn acquarium_monitoring.wsgi –log-file -

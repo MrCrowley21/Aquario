@@ -1,0 +1,5 @@
+core==1.0.1
+Django==3.2.18
+djangorestframework==3.14.0
+graphene==3.2.2
+graphene_django==3.0.0
