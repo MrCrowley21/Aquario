@@ -9,8 +9,6 @@ type Query {
 
 type UserType {
   id: ID!
-  firstName: String!
-  lastName: String!
   email: String!
 }
 
