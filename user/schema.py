@@ -63,9 +63,3 @@ class Mutation(ObjectType):
     login = graphql_jwt.ObtainJSONWebToken.Field()
     verify_token = graphql_jwt.Verify.Field()
     refresh_token = graphql_jwt.Refresh.Field()
-
-    """
-    User Profiles
-    """
-
-    # update_user_profile = UpdateUserProfile.Field()

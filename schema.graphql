@@ -1,5 +1,10 @@
+scalar GenericScalar
+
 type Query {
   users: [UserType]
+  user(id: Int): UserType
+  userProfile(id: Int): UserProfileType
+  me: UserProfileType
 }
 
 type UserType {
@@ -13,3 +18,31 @@ type UserProfileType {
   id: ID!
   user: UserType!
 }
+
+type CreateUser {
+  id: ID
+}
+
+type ObtainJSONWebToken {
+  payload: GenericScalar!
+  refreshExpiresIn: Int!
+  token: String!
+}
+
+type Verify {
+  payload: GenericScalar!
+}
+
+type Refresh {
+  payload: GenericScalar!
+  refreshExpiresIn: Int!
+  token: String!
+}
+
+type Mutation {
+  createUser(email: String!, password: String!): CreateUser
+  login(email: String!, password: String!): ObtainJSONWebToken
+  verifyToken(token: String): Verify
+  refreshToken(token: String): Refresh
+}
+
