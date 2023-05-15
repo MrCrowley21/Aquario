@@ -63,17 +63,19 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 
 class Aquarium(models.Model):
-    code = models.ForeignKey('UserProfile', on_delete=models.PROTECT)
+    code = models.ForeignKey('UserProfile', on_delete=models.CASCADE)
+    aquarium_id = models.CharField(max_length=20, default=None)
     nickname = models.CharField(max_length=100)
-    fish_id = models.ForeignKey('Fish', on_delete=models.PROTECT)
-    volume = models.FloatField()
-    length = models.FloatField()
-    width = models.FloatField()
-    height = models.FloatField()
-    feeding_time = models.DateTimeField()
-    # sensors = models.ManyToManyField('Environment')
-    water_level = models.FloatField()
-    general_system_state = models.FloatField()
+    # fish_id = models.ForeignKey('Fish', on_delete=models.PROTECT, default=0)
+    volume = models.FloatField(default=0)
+    length = models.FloatField(default=0)
+    width = models.FloatField(default=0)
+    height = models.FloatField(default=0)
+    feeding_time = models.TimeField(default='8:00', blank=True)
+    # water_type = models.ManyToManyField('WaterType')
+    sensors = models.ManyToManyField('Sensor')
+    water_level = models.FloatField(default=0)
+    general_system_state = models.FloatField(default=0)
 
 
 class Fish(models.Model):
@@ -85,3 +87,25 @@ class Fish(models.Model):
 
 class Food(models.Model):
     food_type = models.CharField(max_length=100)
+
+
+class WaterType(models.Model):
+    water_type = models.CharField(max_length=20, blank=False,  unique=True)
+
+
+class RecommendedValues(models.Model):
+    water_type = models.ForeignKey('WaterType', on_delete=models.PROTECT)
+    sensor = models.ForeignKey('Sensor', on_delete=models.PROTECT)
+    fish_type = models.ForeignKey('Fish', on_delete=models.PROTECT, default=None)
+    recommended_value = models.FloatField()
+
+
+class SensorList(models.Model):
+    sensor_name = models.CharField(max_length=20, blank=False,  unique=True)
+
+
+class Sensor(models.Model):
+    sensor_name = models.ForeignKey('SensorList', on_delete=models.PROTECT)
+    current_value = models.FloatField()
+    current_time = models.DateTimeField(blank=True, default=None)
+

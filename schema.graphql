@@ -3,8 +3,11 @@ scalar GenericScalar
 type Query {
   users: [UserType]
   user(id: Int): UserType
-  userProfile(id: Int): UserProfileType
   me: UserProfileType
+  aquarium(id: Int): AquariumType
+  fish: FishType
+  aquarium_id: [AquariumIDs]
+  aquarium_sensors(aquarium_id: Int): [AquariumSensors]
 }
 
 type UserType {
@@ -17,8 +20,48 @@ type UserProfileType {
   user: UserType!
 }
 
+scalar Time
+
+type AquariumType{
+   id: ID!
+   code: UserType!
+   aquarium_id: String!
+   nickname: String!
+   volume: Int
+   length: Int
+   width: Int
+   height: Int
+   feeding_time: Time
+   sensors: [Int]
+   water_level: Float
+   general_system_state: Float
+}
+
+type FishType{
+    id: ID!
+    fish_type: String!
+    common_name: String!
+    scientific_name: String!
+}
+
+type AquariumIDs{
+    id: ID!
+    aquarium_id: String!
+    code: UserType!
+}
+
+type AquariumSensors{
+    id: ID!
+    sensors: [Int]
+}
+
 type CreateUser {
   id: ID
+}
+
+type RegisterAquarium{
+    id: ID!
+    feedback: String
 }
 
 type ObtainJSONWebToken {
@@ -35,6 +78,11 @@ type Refresh {
   payload: GenericScalar!
   refreshExpiresIn: Int!
   token: String!
+}
+
+type RegisterAquarium{
+    id: ID
+    message: String
 }
 
 type Mutation {
