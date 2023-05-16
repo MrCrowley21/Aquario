@@ -90,6 +90,6 @@ type Mutation {
   login(email: String!, password: String!): ObtainJSONWebToken
   verifyToken(token: String): Verify
   refreshToken(token: String): Refresh
-  registerAquarium(code: UserType!, aquarium_id: String!, nickname: String!): RegisterAquarium
+  registerAquarium(aquarium_id: String!, nickname: String!): RegisterAquarium
 }
 

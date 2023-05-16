@@ -164,7 +164,7 @@ class RegisterAquarium(Mutation):
                 feedback="Non-authenticated user"
             )
         aquarium = Aquarium(
-            code=UserProfile.objects.get(user=user),
+            code=UserProfile.objects.get(user=user.id),
             aquarium_id=aquarium_id,
             nickname=nickname
         )
