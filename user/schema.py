@@ -6,6 +6,7 @@ from graphene import Mutation, ObjectType, List, Field, Int, String, ID, Time, D
 from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
 from user.models import *
+from user.ideal_value_resolver import *
 
 
 class UserType(DjangoObjectType):
@@ -112,6 +113,7 @@ class SensorType(DjangoObjectType):
             'sensor_type',
             'current_value',
             'current_time',
+            'ideal_value',
         )
 
 
@@ -124,6 +126,7 @@ class SingleSensorType(DjangoObjectType):
             'sensor_type',
             'current_value',
             'current_time',
+            'ideal_value',
         )
 
 
@@ -173,7 +176,14 @@ class Query(ObjectType):
 
     @staticmethod
     def resolve_aquarium(self, info, **kwargs):
+        sensors_data = []
         aquarium = Aquarium.objects.get(**kwargs)
+        sensors = aquarium.sensors.all()
+        for sensor in sensors:
+            sensor_value = check_parameter(sensor.sensor_type, sensor.current_value)
+            sensors_data.append(sensor_value)
+        system_state = get_system_state(sensors_data)
+        aquarium.general_system_state = system_state
         return aquarium
 
     @staticmethod
@@ -338,6 +348,7 @@ class AddSensor(Mutation):
         aquarium_id = String(required=True)
         sensor_name = String(required=True)
         sensor_type = String(required=True)
+        ideal_value = Float()
 
     @staticmethod
     def mutate(_, info, aquarium_id, sensor_name, sensor_type):
@@ -347,6 +358,7 @@ class AddSensor(Mutation):
             aquarium_id=aquarium_obj,
             sensor_name=SensorList.objects.get(sensor_name=sensor_name),
             sensor_type=sensor_type.upper(),
+            ideal_value=get_ideal_sensor_value(sensor_type.upper())
         )
         sensor.save()
         aquarium_obj.sensors.add(sensor)

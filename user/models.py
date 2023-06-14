@@ -123,4 +123,5 @@ class Sensor(models.Model):
     sensor_name = models.ForeignKey('SensorList', on_delete=models.PROTECT)
     current_value = models.FloatField(blank=True, default=0.0)
     current_time = models.DateTimeField(blank=True, default="1900-01-01 00:00")
+    ideal_value = models.FloatField(default=0)
 
