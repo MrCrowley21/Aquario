@@ -81,6 +81,7 @@ class AquariumIDs(DjangoObjectType):
             'id',
             'aquarium_id',
             'code',
+            'nickname',
         )
 
 

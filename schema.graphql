@@ -65,6 +65,7 @@ type AquariumIDs {
   id: ID!
   code: UserProfileType!
   aquariumId: String!
+  nickname: String!
 }
 
 type AquariumSensors {
