@@ -118,7 +118,7 @@ class Sensor(models.Model):
     sensor_type = models.CharField(
         max_length=11,
         choices=SENSOR_CHOICE,
-        default="Temperature",
+        default="TEMPERATURE",
     )
     sensor_name = models.ForeignKey('SensorList', on_delete=models.PROTECT)
     current_value = models.FloatField(blank=True, default=0.0)

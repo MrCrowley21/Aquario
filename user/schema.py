@@ -346,7 +346,7 @@ class AddSensor(Mutation):
         sensor = Sensor(
             aquarium_id=aquarium_obj,
             sensor_name=SensorList.objects.get(sensor_name=sensor_name),
-            sensor_type=sensor_type,
+            sensor_type=sensor_type.upper(),
         )
         sensor.save()
         aquarium_obj.sensors.add(sensor)
