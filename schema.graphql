@@ -88,12 +88,9 @@ type Refresh {
   token: String!
 }
 
-type RegisterAquarium{
-    id: ID
-}
-
 type ModifyAquariumData{
-    id: ID
+    id: ID!
+    feedback: String
 }
 
 type Mutation {
