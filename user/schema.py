@@ -109,6 +109,7 @@ class SensorType(DjangoObjectType):
         fields = (
             'id',
             'sensor_name',
+            'sensor_type',
             'current_value',
             'current_time',
         )
@@ -120,6 +121,7 @@ class SingleSensorType(DjangoObjectType):
         fields = (
             'id',
             'sensor_name',
+            'sensor_type',
             'current_value',
             'current_time',
         )
@@ -131,6 +133,7 @@ class SensorListType(DjangoObjectType):
         fields = (
             'id',
             'sensor_name',
+            'sensor_type',
         )
 
 
@@ -334,14 +337,16 @@ class AddSensor(Mutation):
     class Arguments:
         aquarium_id = String(required=True)
         sensor_name = String(required=True)
+        sensor_type = String(required=True)
 
     @staticmethod
-    def mutate(_, info, aquarium_id, sensor_name):
+    def mutate(_, info, aquarium_id, sensor_name, sensor_type):
         print(SensorList.objects.get(sensor_name=sensor_name))
         aquarium_obj = Aquarium.objects.get(aquarium_id=aquarium_id)
         sensor = Sensor(
             aquarium_id=aquarium_obj,
             sensor_name=SensorList.objects.get(sensor_name=sensor_name),
+            sensor_type=sensor_type,
         )
         sensor.save()
         aquarium_obj.sensors.add(sensor)

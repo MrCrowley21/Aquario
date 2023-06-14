@@ -106,6 +106,20 @@ class SensorList(models.Model):
 
 class Sensor(models.Model):
     aquarium_id = models.ForeignKey('Aquarium', default=None, on_delete=models.PROTECT)
+    SENSOR_CHOICE = [
+        ("TEMPERATURE", "Temperature"),
+        ("PH", "PH"),
+        ("OXYGEN", "Oxygen"),
+        ("TURBIDITY", "Turbidity"),
+        ("NITRATE", "Nitrate"),
+        ("DURITY", "Durity"),
+        ("AMMONIUM", "Ammonium"),
+    ]
+    sensor_type = models.CharField(
+        max_length=11,
+        choices=SENSOR_CHOICE,
+        default="Temperature",
+    )
     sensor_name = models.ForeignKey('SensorList', on_delete=models.PROTECT)
     current_value = models.FloatField(blank=True, default=0.0)
     current_time = models.DateTimeField(blank=True, default="1900-01-01 00:00")
