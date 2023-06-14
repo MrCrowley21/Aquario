@@ -114,6 +114,17 @@ class SensorType(DjangoObjectType):
         )
 
 
+class SingleSensorType(DjangoObjectType):
+    class Meta:
+        model = Sensor
+        fields = (
+            'id',
+            'sensor_name',
+            'current_value',
+            'current_time',
+        )
+
+
 class SensorListType(DjangoObjectType):
     class Meta:
         model = SensorList
@@ -138,7 +149,8 @@ class Query(ObjectType):
     aquarium_id = List(AquariumIDs)
     aquarium_sensors = List(AquariumSensors, aquarium_id=String())
     feeding_time = List(FeedingTime, aquarium_id=String())
-    sensor_type = Field(SensorType, aquarium_id=String())
+    sensor_type = List(SensorType, aquarium_id=String())
+    single_sensor_type = Field(SingleSensorType, aquarium_id=String(), sensor_id=Int())
     sensor_list_type = List(SensorListType)
 
     @staticmethod
@@ -196,8 +208,15 @@ class Query(ObjectType):
         return Aquarium.objects.filter(aquarium_id=aquarium_id)
 
     @staticmethod
-    def resolve_sensor(self, info, aquarium_id, **kwargs):
-        return Sensor.objects.filter(aquarium_id=aquarium_id)
+    def resolve_sensor_type(self, info, aquarium_id, **kwargs):
+        aquarium_obj = Aquarium.objects.get(aquarium_id=aquarium_id)
+        return Sensor.objects.filter(aquarium_id=aquarium_obj)
+
+    @staticmethod
+    def resolve_single_sensor_type(self, info, aquarium_id, sensor_id, **kwargs):
+        aquarium_obj = Aquarium.objects.get(aquarium_id=aquarium_id)
+        print("here")
+        return Sensor.objects.get(aquarium_id=aquarium_obj, id=sensor_id)
 
     @staticmethod
     def resolve_sensor_list_type(self, info, aquarium_id, **kwargs):

@@ -10,7 +10,8 @@ type Query {
   aquariumId: [AquariumIDs]
   aquariumSensors(aquariumId: String): [AquariumSensors]
   feedingTime(aquariumId: String): [FeedingTime]
-  sensorType(aquariumId: String): SensorType
+  sensorType(aquariumId: String): [SensorType]
+  singleSensorType(aquariumId: String, sensorId: Int): SingleSensorType
   sensorListType: [SensorListType]
 }
 
@@ -35,7 +36,7 @@ type AquariumType {
   height: Float!
   feedingTime: Time!
   waterLevel: Float!
-  sensors: [SensorType!]!
+  sensors: [SingleSensorType!]!
   generalSystemState: Float!
 }
 
@@ -64,7 +65,7 @@ specified by
 """
 scalar Time
 
-type SensorType {
+type SingleSensorType {
   id: ID!
   sensorName: SensorListType!
   currentValue: Float!
@@ -92,11 +93,18 @@ type AquariumIDs {
 
 type AquariumSensors {
   id: ID!
-  sensors: [SensorType!]!
+  sensors: [SingleSensorType!]!
 }
 
 type FeedingTime {
   feedingTime: Time!
+}
+
+type SensorType {
+  id: ID!
+  sensorName: SensorListType!
+  currentValue: Float!
+  currentTime: DateTime!
 }
 
 """
