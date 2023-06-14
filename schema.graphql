@@ -13,6 +13,7 @@ type Query {
   sensorType(aquariumId: String): [SensorType]
   singleSensorType(aquariumId: String, sensorId: Int): SingleSensorType
   sensorListType: [SensorListType]
+  sensorHistory(sensorId: Int, aquariumId: String, timePeriod: String): [SensorHistoryType]
 }
 
 type UserType {
@@ -133,6 +134,38 @@ type SensorType {
   currentValue: Float!
   currentTime: DateTime!
   idealValue: Float!
+}
+
+type SensorHistoryType {
+  """"""
+  id: BigInt!
+  aquariumId: String!
+  sensorId: Int!
+  sensorValue: Float!
+  sensorTime: DateTime!
+  timePeriod: UserHistoricalSensorHistoryTimePeriodChoices!
+}
+
+"""
+The `BigInt` scalar type represents non-fractional whole numeric values.
+`BigInt` is not constrained to 32-bit like the `Int` type and thus is a less
+compatible type.
+"""
+scalar BigInt
+
+"""An enumeration."""
+enum UserHistoricalSensorHistoryTimePeriodChoices {
+  """Day"""
+  DAY
+
+  """Week"""
+  WEEK
+
+  """Month"""
+  MONTH
+
+  """Year"""
+  YEAR
 }
 
 """

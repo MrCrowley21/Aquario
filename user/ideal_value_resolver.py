@@ -102,9 +102,11 @@ def _check_turbidity_parameter(value):
 
 def get_system_state(sensor_values):
     general_state = 0
+    nr_sensors = len(sensor_values)
     for value in sensor_values:
         general_state += value
-    general_state /= len(sensor_values)
+    if nr_sensors > 0:
+        general_state /= nr_sensors
     return "{:.3f}".format(general_state)
 
 

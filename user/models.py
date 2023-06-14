@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from datetime import datetime
 from django.utils.translation import ugettext_lazy as _
+from simple_history.models import HistoricalRecords
 from django.utils import timezone
 import math
 
@@ -124,4 +125,23 @@ class Sensor(models.Model):
     current_value = models.FloatField(blank=True, default=0.0)
     current_time = models.DateTimeField(blank=True, default="1900-01-01 00:00")
     ideal_value = models.FloatField(default=0)
+
+
+class SensorHistory(models.Model):
+    aquarium_id = models.CharField(max_length=20, default=None)
+    sensor_id = models.IntegerField(default=0)
+    sensor_value = models.FloatField(blank=True, default=0.0)
+    sensor_time = models.DateTimeField(blank=True, default="1900-01-01 00:00")
+    TIME_CHOICE = [
+        ("DAY", "Day"),
+        ("WEEK", "Week"),
+        ("MONTH", "Month"),
+        ("YEAR", "Year"),
+    ]
+    time_period = models.CharField(
+        max_length=5,
+        choices=TIME_CHOICE,
+        default="Day",
+    )
+    history = HistoricalRecords()
 

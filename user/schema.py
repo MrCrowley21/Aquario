@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timedelta
 
 import graphene
 import graphql_jwt
@@ -140,6 +141,19 @@ class SensorListType(DjangoObjectType):
         )
 
 
+class SensorHistoryType(DjangoObjectType):
+    class Meta:
+        model = SensorHistory.history.model
+        fields = (
+            'id',
+            'sensor_id',
+            'aquarium_id',
+            'sensor_value',
+            'sensor_time',
+            'time_period',
+        )
+
+
 class Query(ObjectType):
     """
     User queries.
@@ -158,6 +172,7 @@ class Query(ObjectType):
     sensor_type = List(SensorType, aquarium_id=String())
     single_sensor_type = Field(SingleSensorType, aquarium_id=String(), sensor_id=Int())
     sensor_list_type = List(SensorListType)
+    sensor_history = List(SensorHistoryType, sensor_id=Int(), aquarium_id=String(), time_period=String())
 
     @staticmethod
     def resolve_users(self, info, **kwargs):
@@ -228,12 +243,29 @@ class Query(ObjectType):
     @staticmethod
     def resolve_single_sensor_type(self, info, aquarium_id, sensor_id, **kwargs):
         aquarium_obj = Aquarium.objects.get(aquarium_id=aquarium_id)
-        print("here")
         return Sensor.objects.get(aquarium_id=aquarium_obj, id=sensor_id)
 
     @staticmethod
     def resolve_sensor_list_type(self, info, aquarium_id, **kwargs):
         return SensorList.objects.all()
+
+    @staticmethod
+    def resolve_sensor_history(self, info, sensor_id, aquarium_id, time_period, **kwargs):
+        # aquarium_obj = Aquarium.objects.get(aquarium_id=aquarium_id)
+        # sensor_obj = Sensor.objects.get(sensor_id=sensor_id, aquarium_id=aquarium_obj)
+        period = time_period.upper()
+        if period == "YEAR":
+            nr_days = 365
+        elif period == "MONTH":
+            nr_days = 30
+        elif period == "WEEK":
+            nr_days = 7
+        else:
+            nr_days = 1
+        one_month_ago = datetime.now() - timedelta(days=nr_days)
+        sensor_history = SensorHistory.objects.get(sensor_id=sensor_id, aquarium_id=aquarium_id)
+        # print(sensor_history.history.filter(sensor_id=sensor_id, aquarium_id=aquarium_id))
+        return sensor_history.history.filter(sensor_time__gt=one_month_ago)
 
 
 class CreateUser(Mutation):
@@ -361,6 +393,11 @@ class AddSensor(Mutation):
             ideal_value=get_ideal_sensor_value(sensor_type.upper())
         )
         sensor.save()
+        sensor_history = SensorHistory(
+            aquarium_id=aquarium_id,
+            sensor_id=sensor.id)
+        # sensor_history.sensor_id.add(sensor)
+        sensor_history.save()
         aquarium_obj.sensors.add(sensor)
         return AddSensor(
             id=sensor.id,
@@ -376,7 +413,7 @@ class UpdateSensor(Mutation):
         aquarium_id = String(required=True)
         current_value = Float(required=True)
         current_time = DateTime(required=True)
-
+    # 2023-06-14T14:49:00+02:00
     @staticmethod
     def mutate(_, info, pk, aquarium_id, current_value, current_time):
         aquarium_obj = Aquarium.objects.get(aquarium_id=aquarium_id)
@@ -384,6 +421,12 @@ class UpdateSensor(Mutation):
         sensor.current_value = current_value
         sensor.current_time = current_time
         sensor.save()
+        sensor_history = SensorHistory.objects.get(aquarium_id=aquarium_id, sensor_id=sensor.id)
+        # sensor_history = SensorHistory.objects.create(aquarium_id=aquarium_obj)
+        # sensor_history.sensor_id.add(sensor)
+        sensor_history.sensor_value = current_value
+        sensor_history.sensor_time = current_time
+        sensor_history.save()
         return UpdateSensor(
             id=sensor.id,
             feedback="Success")
