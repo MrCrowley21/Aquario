@@ -1,14 +1,15 @@
-scalar GenericScalar
-
+"""Projects main Query class, this will inherit multiple queries."""
 type Query {
   users: [UserType]
   user(id: Int): UserType
   me: UserProfileType
   aquarium(id: Int): AquariumType
-  fish: FishType
-  food: FoodType
-  aquarium_id: [AquariumIDs]
-  aquarium_sensors(aquarium_id: Int): [AquariumSensors]
+  fish: [FishType]
+  fishType: [FishTypeWater]
+  food: [FoodType]
+  aquariumId: [AquariumIDs]
+  aquariumSensors(aquariumId: Int): [AquariumSensors]
+  feedingTime(aquariumId: String): [FeedingTime]
 }
 
 type UserType {
@@ -17,66 +18,95 @@ type UserType {
 }
 
 type UserProfileType {
-  id: ID!
   user: UserType!
 }
 
+type AquariumType {
+  id: ID!
+  code: UserProfileType!
+  aquariumId: String!
+  nickname: String!
+  fishId: [FishType!]!
+  volume: Float!
+  length: Float!
+  width: Float!
+  height: Float!
+  feedingTime: Time!
+  waterLevel: Float!
+  generalSystemState: Float!
+}
+
+type FishType {
+  id: ID!
+  fishType: FishTypeWater!
+  commonName: String!
+  scientificName: String!
+  foodId: FoodType!
+}
+
+type FishTypeWater {
+  id: ID!
+  waterType: String!
+}
+
+type FoodType {
+  id: ID!
+  foodType: String!
+}
+
+"""
+The `Time` scalar type represents a Time value as
+specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
 scalar Time
 
-type AquariumType{
-   id: ID!
-   code: UserType!
-   aquarium_id: String!
-   nickname: String!
-   fish_id: Int
-   volume: Int
-   length: Int
-   width: Int
-   height: Int
-   feeding_time: Time
-   sensors: [Int]
-   water_level: Float
-   general_system_state: Float
+type AquariumIDs {
+  id: ID!
+  code: UserProfileType!
+  aquariumId: String!
 }
 
-type FishType{
-    id: ID!
-    fish_type: String!
-    common_name: String!
-    scientific_name: String!
-    food_id: [FoodType]!
+type AquariumSensors {
+  id: ID!
 }
 
-type FoodType{
-    id: ID!
-    food_type: String!
+type FeedingTime {
+  feedingTime: Time!
 }
 
-type AquariumIDs{
-    id: ID!
-    aquarium_id: String!
-    code: UserType!
-}
+"""
+Projects main Mutation class, this will
+inherit multiple mutations.
+"""
+type Mutation {
+  createUser(email: String!, password: String!): CreateUser
 
-type AquariumSensors{
-    id: ID!
-    sensors: [Int]
+  """Obtain JSON Web Token mutation"""
+  login(email: String!, password: String!): ObtainJSONWebToken
+  verifyToken(token: String): Verify
+  refreshToken(token: String): Refresh
+  registerAquarium(aquariumId: String!, feedingTime: Time, fishId: Int, height: Int, length: Int, nickname: String!, volume: Int, width: Int): RegisterAquarium
+  modifyAquarium(aquariumId: String!, feedingTime: Time, fishId: Int, nickname: String): ModifyAquariumData
 }
 
 type CreateUser {
   id: ID
 }
 
-type RegisterAquarium{
-    id: ID!
-    feedback: String
-}
-
+"""Obtain JSON Web Token mutation"""
 type ObtainJSONWebToken {
   payload: GenericScalar!
   refreshExpiresIn: Int!
   token: String!
 }
+
+"""
+The `GenericScalar` scalar type represents a generic
+GraphQL scalar value that could be:
+String, Boolean, Int, Float, List or Object.
+"""
+scalar GenericScalar
 
 type Verify {
   payload: GenericScalar!
@@ -88,17 +118,12 @@ type Refresh {
   token: String!
 }
 
-type ModifyAquariumData{
-    id: ID!
-    feedback: String
+type RegisterAquarium {
+  id: ID
+  feedback: String
 }
 
-type Mutation {
-  createUser(email: String!, password: String!): CreateUser
-  login(email: String!, password: String!): ObtainJSONWebToken
-  verifyToken(token: String): Verify
-  refreshToken(token: String): Refresh
-  registerAquarium(aquarium_id: String!, nickname: String!, fish_id: Int, length: Int, width: Int, height: Int, volume: Int, feeding_time: Time): RegisterAquarium
-  modifyAquarium(aquarium_id: String!, nickname: String, fish_id: Int, feeding_time: Time): ModifyAquariumData
+type ModifyAquariumData {
+  id: ID
+  feedback: String
 }
-
