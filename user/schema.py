@@ -203,7 +203,7 @@ class RegisterAquarium(Mutation):
         feeding_time = Time()
 
     @staticmethod
-    def mutate(_, info, aquarium_id, nickname, fish_id, feeding_time):
+    def mutate(_, info, aquarium_id, nickname, fish_id, feeding_time, length, width, height, volume):
         user = info.context.user
         # print(info.context)
         if not user.is_authenticated:
@@ -218,6 +218,14 @@ class RegisterAquarium(Mutation):
         )
         if feeding_time is not None:
             aquarium.feeding_time = feeding_time
+        if length is not None:
+            aquarium.length = length
+        if width is not None:
+            aquarium.width = width
+        if height is not None:
+            aquarium.height = height
+        if volume is not None:
+            aquarium.volume = volume
         aquarium.save()
         try:
             # print(Fish.objects.all())
