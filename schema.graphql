@@ -28,6 +28,7 @@ type AquariumType{
    code: UserType!
    aquarium_id: String!
    nickname: String!
+   fish_id: Int
    volume: Int
    length: Int
    width: Int

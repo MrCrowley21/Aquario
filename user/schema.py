@@ -57,6 +57,14 @@ class FishType(DjangoObjectType):
         )
 
 
+class FeedingTime(DjangoObjectType):
+    class Meta:
+        model = Aquarium
+        fields = (
+            'feeding_time',
+        )
+
+
 class FoodType(DjangoObjectType):
     class Meta:
         model = Food
@@ -108,6 +116,7 @@ class Query(ObjectType):
     food = List(FoodType)
     aquarium_id = List(AquariumIDs)
     aquarium_sensors = List(AquariumSensors, aquarium_id=Int())
+    feeding_time = List(FeedingTime, aquarium_id=String())
 
     @staticmethod
     def resolve_users(self, info, **kwargs):
@@ -157,6 +166,11 @@ class Query(ObjectType):
     def resolve_food(self, info, **kwargs):
         food = Food.objects.all()
         return food
+
+    @staticmethod
+    def resolve_feeding_time(self, info, aquarium_id, **kwargs):
+        print(aquarium_id)
+        return Aquarium.objects.filter(aquarium_id=aquarium_id)
 
 
 class CreateUser(Mutation):
