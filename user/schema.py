@@ -353,6 +353,24 @@ class UpdateSensor(Mutation):
             feedback="Success")
 
 
+class UpdateWaterLevel(Mutation):
+    id = ID()
+    feedback = String()
+
+    class Arguments:
+        aquarium_id = String(required=True)
+        water_level = Float(required=True)
+
+    @staticmethod
+    def mutate(_, info, aquarium_id, water_level):
+        aquarium = Aquarium.objects.get(aquarium_id=aquarium_id)
+        aquarium.water_level = water_level
+        aquarium.save()
+        return UpdateSensor(
+            id=aquarium.id,
+            feedback="Success")
+
+
 class Mutation(ObjectType):
     """
     Mutations for Users
@@ -369,3 +387,4 @@ class Mutation(ObjectType):
     modify_aquarium = ModifyAquariumData.Field()
     add_sensor = AddSensor.Field()
     update_sensor = UpdateSensor.Field()
+    update_water_level = UpdateWaterLevel.Field()

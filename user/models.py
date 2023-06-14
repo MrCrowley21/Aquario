@@ -73,8 +73,8 @@ class Aquarium(models.Model):
     height = models.FloatField(default=0)
     feeding_time = models.TimeField(default='8:00', blank=True)
     water_type = models.ForeignKey('WaterType', default=1, on_delete=models.CASCADE)
+    water_level = models.FloatField(default=86.0)
     sensors = models.ManyToManyField('Sensor', default=None)
-    water_level = models.FloatField(default=0)
     general_system_state = models.FloatField(default=0)
 
 

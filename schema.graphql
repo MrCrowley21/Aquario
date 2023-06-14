@@ -34,8 +34,8 @@ type AquariumType {
   width: Float!
   height: Float!
   feedingTime: Time!
-  sensors: [SensorType!]!
   waterLevel: Float!
+  sensors: [SensorType!]!
   generalSystemState: Float!
 }
 
@@ -114,6 +114,7 @@ type Mutation {
   modifyAquarium(aquariumId: String!, feedingTime: Time, fishId: Int, nickname: String): ModifyAquariumData
   addSensor(aquariumId: String!, sensorName: String!): AddSensor
   updateSensor(aquariumId: String!, currentTime: DateTime!, currentValue: Float!, pk: Int!): UpdateSensor
+  updateWaterLevel(aquariumId: String!, waterLevel: Float!): UpdateWaterLevel
 }
 
 type CreateUser {
@@ -160,6 +161,11 @@ type AddSensor {
 }
 
 type UpdateSensor {
+  id: ID
+  feedback: String
+}
+
+type UpdateWaterLevel {
   id: ID
   feedback: String
 }
