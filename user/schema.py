@@ -1,7 +1,8 @@
 import logging
 
+import graphene
 import graphql_jwt
-from graphene import Mutation, ObjectType, List, Field, Int, String, ID
+from graphene import Mutation, ObjectType, List, Field, Int, String, ID, Time
 from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
 from user.models import *
@@ -32,6 +33,7 @@ class AquariumType(DjangoObjectType):
             'code',
             'aquarium_id',
             'nickname',
+            'fish_id',
             'volume',
             'length',
             'width',
@@ -51,6 +53,16 @@ class FishType(DjangoObjectType):
             'fish_type',
             'common_name',
             'scientific_name',
+            "food_id",
+        )
+
+
+class FoodType(DjangoObjectType):
+    class Meta:
+        model = Food
+        fields = (
+            'id',
+            'food_type',
         )
 
 
@@ -61,6 +73,15 @@ class AquariumIDs(DjangoObjectType):
             'id',
             'aquarium_id',
             'code',
+        )
+
+
+class FishTypeWater(DjangoObjectType):
+    class Meta:
+        model = WaterType
+        fields = (
+            'id',
+            'water_type',
         )
 
 
@@ -82,7 +103,9 @@ class Query(ObjectType):
     me = Field(UserProfileType)
 
     aquarium = Field(AquariumType, id=Int())
-    fish = Field(FishType)
+    fish = List(FishType)
+    fish_type = List(FishTypeWater)
+    food = List(FoodType)
     aquarium_id = List(AquariumIDs)
     aquarium_sensors = List(AquariumSensors, aquarium_id=Int())
 
@@ -108,8 +131,13 @@ class Query(ObjectType):
 
     @staticmethod
     def resolve_fish(self, info, **kwargs):
-        fish = Fish.objects.get(**kwargs)
+        fish = Fish.objects.all()
         return fish
+
+    @staticmethod
+    def resolve_fish_type(self, info, **kwargs):
+        fish_type = WaterType.objects.all()
+        return fish_type
 
     @staticmethod
     def resolve_aquarium_id(self, info, **kwargs):
@@ -124,6 +152,11 @@ class Query(ObjectType):
             raise Exception("Non-authenticated user")
         sensors_data = Aquarium.objects.filter(aquarium_id=aquarium_id)
         return sensors_data
+
+    @staticmethod
+    def resolve_food(self, info, **kwargs):
+        food = Food.objects.all()
+        return food
 
 
 class CreateUser(Mutation):
@@ -144,20 +177,21 @@ class CreateUser(Mutation):
 class RegisterAquarium(Mutation):
     id = ID()
     feedback = String()
+
     class Arguments:
         aquarium_id = String(required=True)
         nickname = String(required=True)
-        # fish_id = String(required=True)
+        fish_id = Int()
         length = Int()
         width = Int()
         height = Int()
         volume = Int()
-        # feeding_time =
+        feeding_time = Time()
 
     @staticmethod
-    def mutate(_, info, aquarium_id, nickname):
+    def mutate(_, info, aquarium_id, nickname, fish_id, feeding_time):
         user = info.context.user
-        print(info.context)
+        # print(info.context)
         if not user.is_authenticated:
             return RegisterAquarium(
                 id=None,
@@ -166,10 +200,57 @@ class RegisterAquarium(Mutation):
         aquarium = Aquarium(
             code=UserProfile.objects.get(user=user.id),
             aquarium_id=aquarium_id,
-            nickname=nickname
+            nickname=nickname,
         )
+        if feeding_time is not None:
+            aquarium.feeding_time = feeding_time
         aquarium.save()
+        try:
+            # print(Fish.objects.all())
+            fish_obj = Fish.objects.get(id=fish_id)
+            aquarium.fish_id.add(fish_obj)
+        except:
+            logging.info("Non-valid fish")
+            print("Fish fail")
         return RegisterAquarium(
+            id=aquarium.id,
+            feedback="Success")
+
+
+class ModifyAquariumData(Mutation):
+    id = ID()
+    feedback = String()
+
+    class Arguments:
+        aquarium_id = String(required=True)
+        nickname = String(required=False)
+        fish_id = Int(required=False)
+        feeding_time = graphene.Time(required=False)
+
+    @staticmethod
+    def mutate(_, info, aquarium_id, nickname, feeding_time, fish_id):
+        user = info.context.user
+        # print(info.context)
+        if not user.is_authenticated:
+            return RegisterAquarium(
+                id=None,
+                feedback="Non-authenticated user"
+            )
+
+        aquarium = Aquarium.objects.get(code=UserProfile.objects.get(user=user.id), aquarium_id=aquarium_id)
+
+        if nickname is not None:
+            aquarium.nickname = nickname
+        if feeding_time is not None:
+            aquarium.feeding_time = feeding_time
+        aquarium.save()
+        try:
+            fish_obj = Fish.objects.get(id=fish_id)
+            aquarium.fish_id.add(fish_obj)
+        except:
+            logging.info("Non-valid fish")
+
+        return ModifyAquariumData(
             id=aquarium.id,
             feedback="Success")
 
@@ -187,3 +268,4 @@ class Mutation(ObjectType):
     Mutations for aquarium components
     """
     register_aquarium = RegisterAquarium.Field()
+    modify_aquarium = ModifyAquariumData.Field()

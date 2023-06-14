@@ -66,20 +66,20 @@ class Aquarium(models.Model):
     code = models.ForeignKey('UserProfile', on_delete=models.CASCADE)
     aquarium_id = models.CharField(max_length=20, default=None)
     nickname = models.CharField(max_length=100)
-    # fish_id = models.ForeignKey('Fish', on_delete=models.PROTECT, default=0)
+    fish_id = models.ManyToManyField('Fish')
     volume = models.FloatField(default=0)
     length = models.FloatField(default=0)
     width = models.FloatField(default=0)
     height = models.FloatField(default=0)
     feeding_time = models.TimeField(default='8:00', blank=True)
-    # water_type = models.ManyToManyField('WaterType')
+    water_type = models.ForeignKey('WaterType', default=1, on_delete=models.CASCADE)
     sensors = models.ManyToManyField('Sensor')
     water_level = models.FloatField(default=0)
     general_system_state = models.FloatField(default=0)
 
 
 class Fish(models.Model):
-    fish_type = models.CharField(max_length=100)
+    fish_type = models.ForeignKey('WaterType', on_delete=models.PROTECT)
     common_name = models.CharField(max_length=100)
     scientific_name = models.CharField(max_length=100)
     food_id = models.ForeignKey('Food', on_delete=models.PROTECT)

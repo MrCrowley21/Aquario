@@ -6,6 +6,7 @@ type Query {
   me: UserProfileType
   aquarium(id: Int): AquariumType
   fish: FishType
+  food: FoodType
   aquarium_id: [AquariumIDs]
   aquarium_sensors(aquarium_id: Int): [AquariumSensors]
 }
@@ -42,6 +43,12 @@ type FishType{
     fish_type: String!
     common_name: String!
     scientific_name: String!
+    food_id: [FoodType]!
+}
+
+type FoodType{
+    id: ID!
+    food_type: String!
 }
 
 type AquariumIDs{
@@ -82,7 +89,10 @@ type Refresh {
 
 type RegisterAquarium{
     id: ID
-    message: String
+}
+
+type ModifyAquariumData{
+    id: ID
 }
 
 type Mutation {
@@ -90,6 +100,7 @@ type Mutation {
   login(email: String!, password: String!): ObtainJSONWebToken
   verifyToken(token: String): Verify
   refreshToken(token: String): Refresh
-  registerAquarium(aquarium_id: String!, nickname: String!): RegisterAquarium
+  registerAquarium(aquarium_id: String!, nickname: String!, fish_id: Int, length: Int, width: Int, height: Int, volume: Int, feeding_time: Time): RegisterAquarium
+  modifyAquarium(aquarium_id: String!, nickname: String, fish_id: Int, feeding_time: Time): ModifyAquariumData
 }
 

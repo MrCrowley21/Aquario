@@ -1,0 +1,139 @@
+[
+  {
+    "model": "user.Food",
+    "pk": 1,
+    "fields": {
+      "food_type": "Fish flakes"
+    }
+  },
+  {
+    "model": "user.Food",
+    "pk": 2,
+    "fields": {
+      "food_type": "Fish pallets"
+    }
+  },
+  {
+    "model": "user.Food",
+    "pk": 3,
+    "fields": {
+      "food_type": "Tablets for fish"
+    }
+  },
+  {
+    "model": "user.Food",
+    "pk": 4 ,
+    "fields": {
+      "food_type": "Fish sticks"
+    }
+  },
+  {
+    "model": "user.Food",
+    "pk": 5,
+    "fields": {
+      "food_type": "Fish wafers"
+    }
+  },
+  {
+    "model": "user.Food",
+    "pk": 6,
+    "fields": {
+      "food_type": "Fish chips"
+    }
+  },
+  {
+    "model": "user.Food",
+    "pk": 7,
+    "fields": {
+      "food_type": "Fish-dried fish food"
+    }
+  },
+  {
+    "model": "user.Food",
+    "pk": 8,
+    "fields": {
+      "food_type": "Natural foods"
+    }
+  },
+  {
+    "model": "user.WaterType",
+    "pk": 1,
+    "fields": {
+      "water_type": "Freshwater"
+    }
+  },
+  {
+    "model": "user.WaterType",
+    "pk": 2,
+    "fields": {
+      "water_type": "Saltwater"
+    }
+  },
+  {
+    "model": "user.WaterType",
+    "pk": 3,
+    "fields": {
+      "water_type": "Mix"
+    }
+  },
+  {
+    "model": "user.Fish",
+    "pk": 1,
+    "fields": {
+      "fish_type": 1,
+      "common_name": "African Lampeyes",
+      "scientific_name": "Congopanchax myersi – Hummingbird Lampeye",
+      "food_id": 1
+    }
+  },
+  {
+    "model": "user.Fish",
+    "pk": 2,
+    "fields": {
+      "fish_type": 1,
+      "common_name": "African Tetra's",
+      "scientific_name": "Alestopetersius smykalai",
+      "food_id": 8
+    }
+  },
+  {
+    "model": "user.Fish",
+    "pk": 3,
+    "fields": {
+      "fish_type": 1,
+      "common_name": "Angelfish",
+      "scientific_name": "Pterophyllum scalare",
+      "food_id": 5
+    }
+  },
+  {
+    "model": "user.Fish",
+    "pk": 4,
+    "fields": {
+      "fish_type": 2,
+      "common_name": "Anemonefish / Clownfish",
+      "scientific_name": "Pomacentridae",
+      "food_id": 8
+    }
+  },
+  {
+    "model": "user.Fish",
+    "pk": 5,
+    "fields": {
+      "fish_type": 2,
+      "common_name": "Longfin Bannerfish",
+      "scientific_name": "Heniochus acuminatus",
+      "food_id": 2
+    }
+  },
+  {
+    "model": "user.Fish",
+    "pk": 6,
+    "fields": {
+      "fish_type": 2,
+      "common_name": "Eastern Footballer",
+      "scientific_name": "Atypichthys latus",
+      "food_id": 8
+    }
+  }
+]
