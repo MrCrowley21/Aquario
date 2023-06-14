@@ -2,7 +2,7 @@ import logging
 
 import graphene
 import graphql_jwt
-from graphene import Mutation, ObjectType, List, Field, Int, String, ID, Time
+from graphene import Mutation, ObjectType, List, Field, Int, String, ID, Time, DateTime, Float
 from graphene_django.types import DjangoObjectType
 from django.contrib.auth.models import User
 from user.models import *
@@ -103,6 +103,26 @@ class AquariumSensors(DjangoObjectType):
         )
 
 
+class SensorType(DjangoObjectType):
+    class Meta:
+        model = Sensor
+        fields = (
+            'id',
+            'sensor_name',
+            'current_value',
+            'current_time',
+        )
+
+
+class SensorListType(DjangoObjectType):
+    class Meta:
+        model = SensorList
+        fields = (
+            'id',
+            'sensor_name',
+        )
+
+
 class Query(ObjectType):
     """
     User queries.
@@ -116,8 +136,10 @@ class Query(ObjectType):
     fish_type = List(FishTypeWater)
     food = List(FoodType)
     aquarium_id = List(AquariumIDs)
-    aquarium_sensors = List(AquariumSensors, aquarium_id=Int())
+    aquarium_sensors = List(AquariumSensors, aquarium_id=String())
     feeding_time = List(FeedingTime, aquarium_id=String())
+    sensor_type = Field(SensorType, aquarium_id=String())
+    sensor_list_type = List(SensorListType)
 
     @staticmethod
     def resolve_users(self, info, **kwargs):
@@ -172,6 +194,14 @@ class Query(ObjectType):
     def resolve_feeding_time(self, info, aquarium_id, **kwargs):
         print(aquarium_id)
         return Aquarium.objects.filter(aquarium_id=aquarium_id)
+
+    @staticmethod
+    def resolve_sensor(self, info, aquarium_id, **kwargs):
+        return Sensor.objects.filter(aquarium_id=aquarium_id)
+
+    @staticmethod
+    def resolve_sensor_list_type(self, info, aquarium_id, **kwargs):
+        return SensorList.objects.all()
 
 
 class CreateUser(Mutation):
@@ -278,6 +308,51 @@ class ModifyAquariumData(Mutation):
             feedback="Success")
 
 
+class AddSensor(Mutation):
+    id = ID()
+    feedback = String()
+
+    class Arguments:
+        aquarium_id = String(required=True)
+        sensor_name = String(required=True)
+
+    @staticmethod
+    def mutate(_, info, aquarium_id, sensor_name):
+        print(SensorList.objects.get(sensor_name=sensor_name))
+        aquarium_obj = Aquarium.objects.get(aquarium_id=aquarium_id)
+        sensor = Sensor(
+            aquarium_id=aquarium_obj,
+            sensor_name=SensorList.objects.get(sensor_name=sensor_name),
+        )
+        sensor.save()
+        aquarium_obj.sensors.add(sensor)
+        return AddSensor(
+            id=sensor.id,
+            feedback="Success")
+
+
+class UpdateSensor(Mutation):
+    id = ID()
+    feedback = String()
+
+    class Arguments:
+        pk = Int(required=True)
+        aquarium_id = String(required=True)
+        current_value = Float(required=True)
+        current_time = DateTime(required=True)
+
+    @staticmethod
+    def mutate(_, info, pk, aquarium_id, current_value, current_time):
+        aquarium_obj = Aquarium.objects.get(aquarium_id=aquarium_id)
+        sensor = Sensor.objects.get(aquarium_id=aquarium_obj, pk=pk)
+        sensor.current_value = current_value
+        sensor.current_time = current_time
+        sensor.save()
+        return UpdateSensor(
+            id=sensor.id,
+            feedback="Success")
+
+
 class Mutation(ObjectType):
     """
     Mutations for Users
@@ -292,3 +367,5 @@ class Mutation(ObjectType):
     """
     register_aquarium = RegisterAquarium.Field()
     modify_aquarium = ModifyAquariumData.Field()
+    add_sensor = AddSensor.Field()
+    update_sensor = UpdateSensor.Field()

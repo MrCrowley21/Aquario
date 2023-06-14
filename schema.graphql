@@ -8,8 +8,10 @@ type Query {
   fishType: [FishTypeWater]
   food: [FoodType]
   aquariumId: [AquariumIDs]
-  aquariumSensors(aquariumId: Int): [AquariumSensors]
+  aquariumSensors(aquariumId: String): [AquariumSensors]
   feedingTime(aquariumId: String): [FeedingTime]
+  sensorType(aquariumId: String): SensorType
+  sensorListType: [SensorListType]
 }
 
 type UserType {
@@ -32,6 +34,7 @@ type AquariumType {
   width: Float!
   height: Float!
   feedingTime: Time!
+  sensors: [SensorType!]!
   waterLevel: Float!
   generalSystemState: Float!
 }
@@ -61,6 +64,25 @@ specified by
 """
 scalar Time
 
+type SensorType {
+  id: ID!
+  sensorName: SensorListType!
+  currentValue: Float!
+  currentTime: DateTime!
+}
+
+type SensorListType {
+  id: ID!
+  sensorName: String!
+}
+
+"""
+The `DateTime` scalar type represents a DateTime
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar DateTime
+
 type AquariumIDs {
   id: ID!
   code: UserProfileType!
@@ -70,6 +92,7 @@ type AquariumIDs {
 
 type AquariumSensors {
   id: ID!
+  sensors: [SensorType!]!
 }
 
 type FeedingTime {
@@ -89,6 +112,8 @@ type Mutation {
   refreshToken(token: String): Refresh
   registerAquarium(aquariumId: String!, feedingTime: Time, fishId: Int, height: Int, length: Int, nickname: String!, volume: Int, width: Int): RegisterAquarium
   modifyAquarium(aquariumId: String!, feedingTime: Time, fishId: Int, nickname: String): ModifyAquariumData
+  addSensor(aquariumId: String!, sensorName: String!): AddSensor
+  updateSensor(aquariumId: String!, currentTime: DateTime!, currentValue: Float!, pk: Int!): UpdateSensor
 }
 
 type CreateUser {
@@ -125,6 +150,16 @@ type RegisterAquarium {
 }
 
 type ModifyAquariumData {
+  id: ID
+  feedback: String
+}
+
+type AddSensor {
+  id: ID
+  feedback: String
+}
+
+type UpdateSensor {
   id: ID
   feedback: String
 }

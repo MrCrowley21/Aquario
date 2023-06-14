@@ -135,5 +135,19 @@
       "scientific_name": "Atypichthys latus",
       "food_id": 8
     }
+  },
+  {
+    "model": "user.SensorList",
+    "pk": 1,
+    "fields": {
+      "sensor_name": "LM393"
+    }
+  },
+  {
+    "model": "user.SensorList",
+    "pk": 2,
+    "fields": {
+      "sensor_name": "DS18B20"
+    }
   }
 ]

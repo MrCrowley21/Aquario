@@ -73,7 +73,7 @@ class Aquarium(models.Model):
     height = models.FloatField(default=0)
     feeding_time = models.TimeField(default='8:00', blank=True)
     water_type = models.ForeignKey('WaterType', default=1, on_delete=models.CASCADE)
-    sensors = models.ManyToManyField('Sensor')
+    sensors = models.ManyToManyField('Sensor', default=None)
     water_level = models.FloatField(default=0)
     general_system_state = models.FloatField(default=0)
 
@@ -101,11 +101,12 @@ class RecommendedValues(models.Model):
 
 
 class SensorList(models.Model):
-    sensor_name = models.CharField(max_length=20, blank=False,  unique=True)
+    sensor_name = models.CharField(max_length=20, unique=True)
 
 
 class Sensor(models.Model):
+    aquarium_id = models.ForeignKey('Aquarium', default=None, on_delete=models.PROTECT)
     sensor_name = models.ForeignKey('SensorList', on_delete=models.PROTECT)
-    current_value = models.FloatField()
-    current_time = models.DateTimeField(blank=True, default=None)
+    current_value = models.FloatField(blank=True, default=0.0)
+    current_time = models.DateTimeField(blank=True, default="1900-01-01 00:00")
 
