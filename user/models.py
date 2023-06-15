@@ -132,6 +132,7 @@ class SensorHistory(models.Model):
     sensor_id = models.IntegerField(default=0)
     sensor_value = models.FloatField(blank=True, default=0.0)
     sensor_time = models.DateTimeField(blank=True, default="1900-01-01 00:00")
+    nr_records = models.IntegerField(default=7)
     TIME_CHOICE = [
         ("DAY", "Day"),
         ("WEEK", "Week"),
@@ -141,7 +142,7 @@ class SensorHistory(models.Model):
     time_period = models.CharField(
         max_length=5,
         choices=TIME_CHOICE,
-        default="Day",
+        default="DAY",
     )
     history = HistoricalRecords()
 

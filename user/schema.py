@@ -151,6 +151,7 @@ class SensorHistoryType(DjangoObjectType):
             'sensor_value',
             'sensor_time',
             'time_period',
+            'nr_records',
         )
 
 
@@ -172,7 +173,11 @@ class Query(ObjectType):
     sensor_type = List(SensorType, aquarium_id=String())
     single_sensor_type = Field(SingleSensorType, aquarium_id=String(), sensor_id=Int())
     sensor_list_type = List(SensorListType)
-    sensor_history = List(SensorHistoryType, sensor_id=Int(), aquarium_id=String(), time_period=String())
+    sensor_history = List(SensorHistoryType, sensor_id=Int(), aquarium_id=String(), time_period=String(),
+                          nr_records=Int())
+    mean_value = Float(sensor_id=Int(), aquarium_id=String(), time_period=String())
+    max_value = Float(sensor_id=Int(), aquarium_id=String(), time_period=String())
+    min_value = Float(sensor_id=Int(), aquarium_id=String(), time_period=String())
 
     @staticmethod
     def resolve_users(self, info, **kwargs):
@@ -250,7 +255,7 @@ class Query(ObjectType):
         return SensorList.objects.all()
 
     @staticmethod
-    def resolve_sensor_history(self, info, sensor_id, aquarium_id, time_period, **kwargs):
+    def resolve_sensor_history(self, info, sensor_id, aquarium_id, time_period, nr_records, **kwargs):
         # aquarium_obj = Aquarium.objects.get(aquarium_id=aquarium_id)
         # sensor_obj = Sensor.objects.get(sensor_id=sensor_id, aquarium_id=aquarium_obj)
         period = time_period.upper()
@@ -262,10 +267,70 @@ class Query(ObjectType):
             nr_days = 7
         else:
             nr_days = 1
-        one_month_ago = datetime.now() - timedelta(days=nr_days)
+        time_past = datetime.now() - timedelta(days=nr_days)
         sensor_history = SensorHistory.objects.get(sensor_id=sensor_id, aquarium_id=aquarium_id)
-        # print(sensor_history.history.filter(sensor_id=sensor_id, aquarium_id=aquarium_id))
-        return sensor_history.history.filter(sensor_time__gt=one_month_ago)
+        history_records = sensor_history.history.filter(sensor_time__gt=time_past)
+        total_records = history_records.count()
+        step_size = max(total_records // (nr_records - 1), 1)
+        output_records = history_records[::step_size]
+        return output_records
+
+    @staticmethod
+    def resolve_mean_value(self, info, aquarium_id, sensor_id, time_period):
+        period = time_period.upper()
+        if period == "YEAR":
+            nr_days = 365
+        elif period == "MONTH":
+            nr_days = 30
+        elif period == "WEEK":
+            nr_days = 7
+        else:
+            nr_days = 1
+        time_past = datetime.now() - timedelta(days=nr_days)
+        sensor_history = SensorHistory.objects.get(sensor_id=sensor_id, aquarium_id=aquarium_id)
+        history_records = sensor_history.history.filter(sensor_time__gt=time_past)
+        values = [history.sensor_value for history in history_records]
+        if len(values) > 0:
+            mean = sum(values) / len(values)
+        else:
+            mean = 0
+        return mean
+
+    @staticmethod
+    def resolve_max_value(self, info, aquarium_id, sensor_id, time_period):
+        period = time_period.upper()
+        if period == "YEAR":
+            nr_days = 365
+        elif period == "MONTH":
+            nr_days = 30
+        elif period == "WEEK":
+            nr_days = 7
+        else:
+            nr_days = 1
+        time_past = datetime.now() - timedelta(days=nr_days)
+        sensor_history = SensorHistory.objects.get(sensor_id=sensor_id, aquarium_id=aquarium_id)
+        history_records = sensor_history.history.filter(sensor_time__gt=time_past)
+        values = [history.sensor_value for history in history_records]
+        max_rec = max(values)
+        return max_rec
+
+    @staticmethod
+    def resolve_min_value(self, info, aquarium_id, sensor_id, time_period):
+        period = time_period.upper()
+        if period == "YEAR":
+            nr_days = 365
+        elif period == "MONTH":
+            nr_days = 30
+        elif period == "WEEK":
+            nr_days = 7
+        else:
+            nr_days = 1
+        time_past = datetime.now() - timedelta(days=nr_days)
+        sensor_history = SensorHistory.objects.get(sensor_id=sensor_id, aquarium_id=aquarium_id)
+        history_records = sensor_history.history.filter(sensor_time__gt=time_past)
+        values = [history.sensor_value for history in history_records]
+        min_rec = min(values)
+        return min_rec
 
 
 class CreateUser(Mutation):

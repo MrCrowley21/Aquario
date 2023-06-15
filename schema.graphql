@@ -13,7 +13,10 @@ type Query {
   sensorType(aquariumId: String): [SensorType]
   singleSensorType(aquariumId: String, sensorId: Int): SingleSensorType
   sensorListType: [SensorListType]
-  sensorHistory(sensorId: Int, aquariumId: String, timePeriod: String): [SensorHistoryType]
+  sensorHistory(sensorId: Int, aquariumId: String, timePeriod: String, nrRecords: Int): [SensorHistoryType]
+  meanValue(sensorId: Int, aquariumId: String, timePeriod: String): Float
+  maxValue(sensorId: Int, aquariumId: String, timePeriod: String): Float
+  minValue(sensorId: Int, aquariumId: String, timePeriod: String): Float
 }
 
 type UserType {
@@ -143,6 +146,7 @@ type SensorHistoryType {
   sensorId: Int!
   sensorValue: Float!
   sensorTime: DateTime!
+  nrRecords: Int!
   timePeriod: UserHistoricalSensorHistoryTimePeriodChoices!
 }
 
